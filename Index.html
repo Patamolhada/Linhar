@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Linhar — Cadernos da Turma</title>
+  <link rel="icon" type="image/png" href="logo.png" />
+  <link rel="apple-touch-icon" href="logo.png" />
+  <style>
+    :root {
+      --bg: #0b0d11;
+      --surface: #12161f;
+      --surface-2: #181d29;
+      --border: rgba(255, 255, 255, 0.08);
+      --text: #f3f4f6;
+      --muted: #9ca3af;
+      --accent: #8b5cf6;
+      --accent-soft: rgba(139, 92, 246, 0.16);
+      --accent-glow: rgba(139, 92, 246, 0.35);
+      --paper: #f6f4ef;
+      --paper-line: rgba(99, 102, 241, 0.16);
+      --paper-ink: #18181b;
+      --paper-muted: #52525b;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background:
+        radial-gradient(circle at top, rgba(139, 92, 246, 0.12), transparent 45%),
+        var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      min-height: 100vh;
+      padding: 24px 16px 64px;
+    }
+
+    .app {
+      max-width: 980px;
+      margin: 0 auto;
+    }
+
+    header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 28px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-logo {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      object-fit: cover;
+      border: 1px solid rgba(139, 92, 246, 0.45);
+      background: var(--surface);
+    }
+
+    .brand h1 {
+      font-size: 1.35rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .brand p {
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .role-badge {
+      font-size: 0.78rem;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--muted);
+    }
+
+    .role-badge.admin {
+      color: #d8b4fe;
+      border-color: rgba(168, 85, 247, 0.45);
+      background: var(--accent-soft);
+    }
+
+    button {
+      font: inherit;
+      cursor: pointer;
+      border: none;
+      border-radius: 10px;
+      transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
+    .btn-ghost {
+      background: var(--surface);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 8px 14px;
+      font-size: 0.88rem;
+    }
+
+    .btn-ghost:hover {
+      border-color: rgba(139, 92, 246, 0.5);
+      background: var(--surface-2);
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+      padding: 9px 15px;
+      font-size: 0.88rem;
+      font-weight: 600;
+    }
+
+    .btn-primary:hover {
+      background: #7c3aed;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-title::before {
+      content: "";
+      width: 4px;
+      height: 16px;
+      border-radius: 999px;
+      background: var(--accent);
+    }
+
+    /* Estante de Cadernos */
+    .shelf {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(185px, 1fr));
+      gap: 22px;
+      margin-bottom: 40px;
+    }
+
+    .notebook-card {
+      perspective: 1200px;
+      background: transparent;
+      text-align: left;
+      padding: 0;
+    }
+
+    .notebook-cover {
+      position: relative;
+      height: 225px;
+      border-radius: 6px 14px 14px 6px;
+      background: linear-gradient(145deg, #1b1829, #10131c);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow:
+        inset -6px 0 12px rgba(0, 0, 0, 0.45),
+        0 12px 24px rgba(0, 0, 0, 0.4);
+      padding: 20px 18px 18px 28px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transform-origin: left center;
+      transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s ease;
+    }
+
+    .notebook-card:hover .notebook-cover {
+      transform: rotateY(-18deg) translateY(-4px);
+      box-shadow:
+        inset -6px 0 12px rgba(0, 0, 0, 0.45),
+        0 18px 32px rgba(0, 0, 0, 0.5),
+        0 0 0 1px rgba(139, 92, 246, 0.35);
+    }
+
+    .notebook-card.opening .notebook-cover {
+      transform: rotateY(-78deg);
+      opacity: 0.25;
+    }
+
+    /* Espiral lateral */
+    .spiral {
+      position: absolute;
+      left: 7px;
+      top: 14px;
+      bottom: 14px;
+      width: 14px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      pointer-events: none;
+    }
+
+    .spiral span {
+      width: 15px;
+      height: 6px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #52525b, #d4d4d8, #52525b);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+    }
+
+    .spine-line {
+      position: absolute;
+      left: 26px;
+      top: 0;
+      bottom: 0;
+      width: 1px;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .nb-tag {
+      display: inline-block;
+      font-size: 0.72rem;
+      color: #c4b5fd;
+      background: var(--accent-soft);
+      border: 1px solid rgba(139, 92, 246, 0.3);
+      padding: 4px 8px;
+      border-radius: 999px;
+      align-self: flex-start;
+    }
+
+    .nb-title {
+      font-size: 1.08rem;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.25;
+      margin-top: 14px;
+    }
+
+    .nb-meta {
+      font-size: 0.78rem;
+      color: var(--muted);
+      border-top: 1px solid rgba(255, 255, 255, 0.07);
+      padding-top: 10px;
+    }
+
+    /* Visualização de Folhas dentro do Caderno */
+    .reader-view {
+      display: none;
+      animation: fadeIn 0.25s ease;
+    }
+
+    .reader-view.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .reader-topbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .reader-subject {
+      font-size: 1.2rem;
+      font-weight: 700;
+    }
+
+    .sheet {
+      position: relative;
+      background-color: var(--paper);
+      background-image: repeating-linear-gradient(
+        to bottom,
+        transparent 0px,
+        transparent 31px,
+        var(--paper-line) 31px,
+        var(--paper-line) 32px
+      );
+      color: var(--paper-ink);
+      border-radius: 6px 16px 16px 6px;
+      padding: 28px 28px 28px 46px;
+      min-height: 360px;
+      box-shadow:
+        -6px 0 0 #d6d3cb,
+        -12px 0 0 #e7e5de,
+        0 20px 40px rgba(0, 0, 0, 0.45);
+      border-left: 2px solid rgba(239, 68, 68, 0.35);
+    }
+
+    .sheet-top {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding-bottom: 14px;
+      margin-bottom: 18px;
+      border-bottom: 1px solid rgba(24, 24, 27, 0.12);
+    }
+
+    .sheet-date {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--paper-muted);
+    }
+
+    .sheet-counter {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #5b21b6;
+      background: rgba(139, 92, 246, 0.14);
+      padding: 4px 10px;
+      border-radius: 999px;
+    }
+
+    .sheet-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      line-height: 1.3;
+      margin-bottom: 14px;
+      color: var(--paper-ink);
+    }
+
+    .sheet-body {
+      font-size: 0.98rem;
+      line-height: 32px;
+      color: var(--paper-ink);
+      white-space: pre-wrap;
+    }
+
+    .sheet-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .sheet-nav button:disabled {
+      opacity: 0.38;
+      cursor: not-allowed;
+    }
+
+    /* Grade de Matérias do Dia */
+    .schedule-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+    }
+
+    .days-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .day-btn {
+      padding: 7px 13px;
+      font-size: 0.85rem;
+      background: var(--surface-2);
+      color: var(--muted);
+      border: 1px solid var(--border);
+    }
+
+    .day-btn.active {
+      background: var(--accent-soft);
+      color: #e9d5ff;
+      border-color: rgba(168, 85, 247, 0.55);
+      font-weight: 600;
+    }
+
+    .today-subjects {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .subject-chip {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      padding: 9px 14px;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      color: var(--text);
+    }
+
+    /* Modais simples para o Modo Admin */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.72);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 50;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal {
+      width: 100%;
+      max-width: 440px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 22px;
+    }
+
+    .modal h3 {
+      font-size: 1.05rem;
+      margin-bottom: 14px;
+    }
+
+    .field {
+      margin-bottom: 12px;
+    }
+
+    .field label {
+      display: block;
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .field input,
+    .field textarea {
+      width: 100%;
+      background: var(--bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font: inherit;
+      font-size: 0.9rem;
+    }
+
+    .field textarea {
+      min-height: 110px;
+      resize: vertical;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .admin-only {
+      display: none;
+    }
+
+    body.is-admin .admin-only {
+      display: inline-flex;
+    }
+
+    @media (max-width: 600px) {
+      .sheet {
+        padding: 22px 18px 22px 34px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div class="brand">
+        <img src="logo.png" alt="Logo Linhar" class="brand-logo" onerror="this.style.display='none'" />
+        <div>
+          <h1>Linhar</h1>
+          <p>Cadernos da turma &amp; matérias do dia</p>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <span id="roleBadge" class="role-badge">Modo Turma</span>
+        <button id="toggleAdminBtn" class="btn-ghost" type="button">Entrar como Admin</button>
+      </div>
+    </header>
+
+    <!-- TELA PRINCIPAL: ESTANTE + MATÉRIAS DO DIA -->
+    <main id="homeView">
+      <div class="section-header">
+        <h2 class="section-title">Cadernos</h2>
+        <button id="openNewSubjectModal" class="btn-primary admin-only" type="button">+ Novo Caderno</button>
+      </div>
+
+      <section id="shelf" class="shelf"></section>
+
+      <section class="schedule-box">
+        <div class="section-header">
+          <h2 class="section-title">Matérias do Dia</h2>
+          <button id="editDayBtn" class="btn-ghost admin-only" type="button">Editar dia</button>
+        </div>
+        <div id="daysBar" class="days-bar"></div>
+        <div id="todaySubjects" class="today-subjects"></div>
+      </section>
+    </main>
+
+    <!-- TELA DO CADERNO ABERTO: FOLHAS INDIVIDUAIS -->
+    <section id="readerView" class="reader-view">
+      <div class="reader-topbar">
+        <button id="backToShelfBtn" class="btn-ghost" type="button">← Voltar para os cadernos</button>
+        <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+          <span id="readerSubjectTitle" class="reader-subject"></span>
+          <button id="openNewSheetModal" class="btn-primary admin-only" type="button">+ Nova Folha</button>
+        </div>
+      </div>
+
+      <article class="sheet">
+        <div class="sheet-top">
+          <span id="sheetDate" class="sheet-date"></span>
+          <span id="sheetCounter" class="sheet-counter"></span>
+        </div>
+        <h3 id="sheetTitle" class="sheet-title"></h3>
+        <div id="sheetBody" class="sheet-body"></div>
+      </article>
+
+      <div class="sheet-nav">
+        <button id="prevSheetBtn" class="btn-ghost" type="button">← Folha anterior</button>
+        <button id="nextSheetBtn" class="btn-ghost" type="button">Próxima folha →</button>
+      </div>
+    </section>
+  </div>
+
+  <!-- MODAL: NOVO CADERNO -->
+  <div id="subjectModal" class="modal-backdrop">
+    <div class="modal">
+      <h3>Novo Caderno</h3>
+      <div class="field">
+        <label for="subjectNameInput">Nome da matéria</label>
+        <input id="subjectNameInput" type="text" placeholder="Ex.: Geografia" />
+      </div>
+      <div class="field">
+        <label for="subjectTagInput">Etiqueta curta (opcional)</label>
+        <input id="subjectTagInput" type="text" placeholder="Ex.: 9º Ano" />
+      </div>
+      <div class="modal-actions">
+        <button class="btn-ghost" type="button" data-close="subjectModal">Cancelar</button>
+        <button id="saveSubjectBtn" class="btn-primary" type="button">Salvar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: NOVA FOLHA -->
+  <div id="sheetModal" class="modal-backdrop">
+    <div class="modal">
+      <h3>Adicionar Folha ao Caderno</h3>
+      <div class="field">
+        <label for="sheetDateInput">Data ou referência</label>
+        <input id="sheetDateInput" type="text" placeholder="Ex.: 12/02 • Aula 03" />
+      </div>
+      <div class="field">
+        <label for="sheetTitleInput">Título do conteúdo</label>
+        <input id="sheetTitleInput" type="text" placeholder="Ex.: Equações do 1º grau" />
+      </div>
+      <div class="field">
+        <label for="sheetBodyInput">Anotações / resumo da aula</label>
+        <textarea id="sheetBodyInput" placeholder="Escreva o conteúdo aqui..."></textarea>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-ghost" type="button" data-close="sheetModal">Cancelar</button>
+        <button id="saveSheetBtn" class="btn-primary" type="button">Publicar folha</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: EDITAR MATÉRIAS DO DIA -->
+  <div id="dayModal" class="modal-backdrop">
+    <div class="modal">
+      <h3 id="dayModalTitle">Editar matérias do dia</h3>
+      <div class="field">
+        <label for="daySubjectsInput">Matérias separadas por vírgula</label>
+        <input id="daySubjectsInput" type="text" placeholder="Ex.: Matemática, Português, História" />
+      </div>
+      <div class="modal-actions">
+        <button class="btn-ghost" type="button" data-close="dayModal">Cancelar</button>
+        <button id="saveDayBtn" class="btn-primary" type="button">Salvar dia</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEY = "linhar_data_v1";
+    const ADMIN_KEY = "linhar_is_admin";
+
+    const DEFAULT_DATA = {
+      notebooks: [
+        {
+          id: "mat",
+          name: "Matemática",
+          tag: "Caderno 01",
+          sheets: [
+            {
+              date: "1º Bimestre • Aula 01",
+              title: "Porcentagem e aumentos sucessivos",
+              body: "Para calcular aumento percentual, multiplicamos o valor por (1 + taxa).\nExemplo: aumento de 15% -> multiplicar por 1,15."
+            },
+            {
+              date: "1º Bimestre • Aula 02",
+              title: "Sistemas de equações lineares",
+              body: "Métodos principais: substituição e adição.\nSempre conferir o par (x, y) nas duas equações."
+            }
+          ]
+        },
+        {
+          id: "port",
+          name: "Português",
+          tag: "Caderno 02",
+          sheets: [
+            {
+              date: "1º Bimestre • Aula 01",
+              title: "Sujeito e predicado",
+              body: "O sujeito é o termo sobre o qual se declara algo; o predicado contém o verbo e o que se diz sobre o sujeito."
+            }
+          ]
+        },
+        {
+          id: "hist",
+          name: "História",
+          tag: "Caderno 03",
+          sheets: [
+            {
+              date: "1º Bimestre • Aula 01",
+              title: "Contexto e principais pontos",
+              body: "Resumo inicial da aula para consulta rápida da turma."
+            }
+          ]
+        }
+      ],
+      schedule: {
+        Seg: ["Matemática", "Português", "História"],
+        Ter: ["Geografia", "Ciências", "Matemática"],
+        Qua: ["Português", "Inglês", "Educação Física"],
+        Qui: ["História", "Matemática", "Artes"],
+        Sex: ["Ciências", "Geografia", "Português"]
+      }
+    };
+
+    function loadData() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        return saved ? JSON.parse(saved) : structuredClone(DEFAULT_DATA);
+      } catch {
+        return structuredClone(DEFAULT_DATA);
+      }
+    }
+
+    function saveData() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state.data));
+    }
+
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get("admin") === "1" || urlParams.get("admin") === "true") {
+      localStorage.setItem(ADMIN_KEY, "true");
+    }
+
+    const state = {
+      data: loadData(),
+      isAdmin: localStorage.getItem(ADMIN_KEY) === "true",
+      activeNotebookId: null,
+      activeSheetIndex: 0,
+      selectedDay: ["Seg", "Ter", "Qua", "Qui", "Sex"].includes(
+        ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"][new Date().getDay()]
+      )
+        ? ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"][new Date().getDay()]
+        : "Seg"
+    };
+
+    function applyAdminUI() {
+      document.body.classList.toggle("is-admin", state.isAdmin);
+      const badge = document.getElementById("roleBadge");
+      const btn = document.getElementById("toggleAdminBtn");
+      if (state.isAdmin) {
+        badge.textContent = "Modo Admin";
+        badge.classList.add("admin");
+        btn.textContent = "Sair do Admin";
+      } else {
+        badge.textContent = "Modo Turma";
+        badge.classList.remove("admin");
+        btn.textContent = "Entrar como Admin";
+      }
+    }
+
+    function renderShelf() {
+      const shelf = document.getElementById("shelf");
+      shelf.innerHTML = "";
+
+      state.data.notebooks.forEach((nb) => {
+        const card = document.createElement("button");
+        card.type = "button";
+        card.className = "notebook-card";
+        const totalSheets = nb.sheets.length;
+        const labelFolhas = totalSheets === 1 ? "1 folha" : `${totalSheets} folhas`;
+
+        card.innerHTML = `
+          <div class="notebook-cover">
+            <div class="spiral">
+              <span></span><span></span><span></span><span></span><span></span><span></span>
+            </div>
+            <div class="spine-line"></div>
+            <span class="nb-tag">${escapeHtml(nb.tag || "Matéria")}</span>
+            <div class="nb-title">${escapeHtml(nb.name)}</div>
+            <div class="nb-meta">${labelFolhas}</div>
+          </div>
+        `;
+
+        card.addEventListener("click", () => {
+          card.classList.add("opening");
+          setTimeout(() => {
+            card.classList.remove("opening");
+            openNotebook(nb.id);
+          }, 220);
+        });
+
+        shelf.appendChild(card);
+      });
+    }
+
+    function openNotebook(id) {
+      const nb = state.data.notebooks.find((item) => item.id === id);
+      if (!nb) return;
+      state.activeNotebookId = id;
+      state.activeSheetIndex = 0;
+
+      document.getElementById("homeView").style.display = "none";
+      document.getElementById("readerView").classList.add("active");
+      document.getElementById("readerSubjectTitle").textContent = nb.name;
+      renderSheet();
+    }
+
+    function closeNotebook() {
+      state.activeNotebookId = null;
+      document.getElementById("readerView").classList.remove("active");
+      document.getElementById("homeView").style.display = "block";
+      renderShelf();
+    }
+
+    function renderSheet() {
+      const nb = state.data.notebooks.find((item) => item.id === state.activeNotebookId);
+      if (!nb) return;
+
+      const total = nb.sheets.length;
+      if (total === 0) {
+        document.getElementById("sheetDate").textContent = "Sem registros";
+        document.getElementById("sheetCounter").textContent = "0 de 0";
+        document.getElementById("sheetTitle").textContent = "Nenhuma folha adicionada ainda";
+        document.getElementById("sheetBody").textContent = "Quando novas aulas forem postadas, elas aparecerão aqui.";
+        document.getElementById("prevSheetBtn").disabled = true;
+        document.getElementById("nextSheetBtn").disabled = true;
+        return;
+      }
+
+      const idx = Math.max(0, Math.min(state.activeSheetIndex, total - 1));
+      state.activeSheetIndex = idx;
+      const sheet = nb.sheets[idx];
+
+      document.getElementById("sheetDate").textContent = sheet.date || "";
+      document.getElementById("sheetCounter").textContent = `Folha ${idx + 1} de ${total}`;
+      document.getElementById("sheetTitle").textContent = sheet.title || "";
+      document.getElementById("sheetBody").textContent = sheet.body || "";
+
+      document.getElementById("prevSheetBtn").disabled = idx === 0;
+      document.getElementById("nextSheetBtn").disabled = idx === total - 1;
+    }
+
+    function renderSchedule() {
+      const days = ["Seg", "Ter", "Qua", "Qui", "Sex"];
+      const bar = document.getElementById("daysBar");
+      const list = document.getElementById("todaySubjects");
+      bar.innerHTML = "";
+      list.innerHTML = "";
+
+      days.forEach((day) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "day-btn" + (state.selectedDay === day ? " active" : "");
+        btn.textContent = day;
+        btn.addEventListener("click", () => {
+          state.selectedDay = day;
+          renderSchedule();
+        });
+        bar.appendChild(btn);
+      });
+
+      const subjects = state.data.schedule[state.selectedDay] || [];
+      subjects.forEach((subj) => {
+        const chip = document.createElement("div");
+        chip.className = "subject-chip";
+        chip.textContent = subj;
+        list.appendChild(chip);
+      });
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;");
+    }
+
+    // Eventos de navegação e Admin
+    document.getElementById("backToShelfBtn").addEventListener("click", closeNotebook);
+
+    document.getElementById("prevSheetBtn").addEventListener("click", () => {
+      state.activeSheetIndex--;
+      renderSheet();
+    });
+
+    document.getElementById("nextSheetBtn").addEventListener("click", () => {
+      state.activeSheetIndex++;
+      renderSheet();
+    });
+
+    document.getElementById("toggleAdminBtn").addEventListener("click", () => {
+      state.isAdmin = !state.isAdmin;
+      localStorage.setItem(ADMIN_KEY, state.isAdmin ? "true" : "false");
+      applyAdminUI();
+    });
+
+    // Modais
+    document.querySelectorAll("[data-close]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        document.getElementById(btn.dataset.close).classList.remove("open");
+      });
+    });
+
+    document.getElementById("openNewSubjectModal").addEventListener("click", () => {
+      document.getElementById("subjectNameInput").value = "";
+      document.getElementById("subjectTagInput").value = "";
+      document.getElementById("subjectModal").classList.add("open");
+    });
+
+    document.getElementById("saveSubjectBtn").addEventListener("click", () => {
+      const name = document.getElementById("subjectNameInput").value.trim();
+      const tag = document.getElementById("subjectTagInput").value.trim() || "Matéria";
+      if (!name) return;
+
+      const id = name.toLowerCase().replace(/[^a-z0-9]+/g, "-") + "-" + Date.now().toString().slice(-4);
+      state.data.notebooks.push({ id, name, tag, sheets: [] });
+      saveData();
+      renderShelf();
+      document.getElementById("subjectModal").classList.remove("open");
+    });
+
+    document.getElementById("openNewSheetModal").addEventListener("click", () => {
+      document.getElementById("sheetDateInput").value = "";
+      document.getElementById("sheetTitleInput").value = "";
+      document.getElementById("sheetBodyInput").value = "";
+      document.getElementById("sheetModal").classList.add("open");
+    });
+
+    document.getElementById("saveSheetBtn").addEventListener("click", () => {
+      const nb = state.data.notebooks.find((item) => item.id === state.activeNotebookId);
+      if (!nb) return;
+
+      const date = document.getElementById("sheetDateInput").value.trim();
+      const title = document.getElementById("sheetTitleInput").value.trim();
+      const body = document.getElementById("sheetBodyInput").value.trim();
+      if (!title && !body) return;
+
+      nb.sheets.push({ date, title: title || "Sem título", body });
+      state.activeSheetIndex = nb.sheets.length - 1;
+      saveData();
+      renderSheet();
+      document.getElementById("sheetModal").classList.remove("open");
+    });
+
+    document.getElementById("editDayBtn").addEventListener("click", () => {
+      document.getElementById("dayModalTitle").textContent = `Matérias de ${state.selectedDay}`;
+      document.getElementById("daySubjectsInput").value = (state.data.schedule[state.selectedDay] || []).join(", ");
+      document.getElementById("dayModal").classList.add("open");
+    });
+
+    document.getElementById("saveDayBtn").addEventListener("click", () => {
+      const raw = document.getElementById("daySubjectsInput").value;
+      const items = raw
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean);
+      state.data.schedule[state.selectedDay] = items;
+      saveData();
+      renderSchedule();
+      document.getElementById("dayModal").classList.remove("open");
+    });
+
+    applyAdminUI();
+    renderShelf();
+    renderSchedule();
+  </script>
+</body>
+</html>
