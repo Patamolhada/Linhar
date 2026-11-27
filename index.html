@@ -6,6 +6,9 @@
   <title>Linhar — Cadernos da Turma</title>
   <link rel="icon" type="image/png" href="logo.png" />
   <link rel="apple-touch-icon" href="logo.png" />
+  <link rel="manifest" href="manifest.json" />
+<meta name="theme-color" content="#8B5CF6" />
+
   <style>
     :root {
       --bg: #0b0d11;
@@ -751,6 +754,13 @@
         .eq("id", ROW_ID)
         .maybeSingle();
 
+     if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js").catch(() => {});
+  });
+}
+
+      
       if (error) {
         setSyncStatus("Sem conexão");
         return;
