@@ -35,13 +35,39 @@
           "body": "Resumo inicial da aula para consulta rápida da turma."
         }
       ]
+    },
+    {
+      "id": "pd3-1256",
+      "name": "PD3",
+      "tag": "Elaine",
+      "sheets": []
     }
   ],
   "schedule": {
-    "Seg": ["Matemática", "Português", "História"],
-    "Ter": ["Geografia", "Ciências", "Matemática"],
-    "Qua": ["Português", "Inglês", "Educação Física"],
-    "Qui": ["História", "Matemática", "Artes"],
-    "Sex": ["Ciências", "Geografia", "Português"]
+    "Seg": [
+      "Matemática",
+      "Português",
+      "História"
+    ],
+    "Ter": [
+      "Geografia",
+      "Ciências",
+      "Matemática"
+    ],
+    "Qua": [
+      "Português",
+      "Inglês",
+      "Educação Física"
+    ],
+    "Qui": [
+      "História",
+      "Matemática",
+      "Artes"
+    ],
+    "Sex": [
+      "Ciências",
+      "Geografia",
+      "Português"
+    ]
   }
 }
