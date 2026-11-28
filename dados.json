@@ -1,0 +1,47 @@
+{
+  "notebooks": [
+    {
+      "id": "mat",
+      "name": "Matemática",
+      "tag": "Caderno 01",
+      "sheets": [
+        {
+          "date": "1º Bimestre • Aula 01",
+          "title": "Porcentagem e aumentos sucessivos",
+          "body": "Para calcular aumento percentual, multiplicamos o valor por (1 + taxa).\nExemplo: aumento de 15% -> multiplicar por 1,15."
+        }
+      ]
+    },
+    {
+      "id": "port",
+      "name": "Português",
+      "tag": "Caderno 02",
+      "sheets": [
+        {
+          "date": "1º Bimestre • Aula 01",
+          "title": "Sujeito e predicado",
+          "body": "O sujeito é o termo sobre o qual se declara algo; o predicado contém o verbo e o que se diz sobre o sujeito."
+        }
+      ]
+    },
+    {
+      "id": "hist",
+      "name": "História",
+      "tag": "Caderno 03",
+      "sheets": [
+        {
+          "date": "1º Bimestre • Aula 01",
+          "title": "Contexto e principais pontos",
+          "body": "Resumo inicial da aula para consulta rápida da turma."
+        }
+      ]
+    }
+  ],
+  "schedule": {
+    "Seg": ["Matemática", "Português", "História"],
+    "Ter": ["Geografia", "Ciências", "Matemática"],
+    "Qua": ["Português", "Inglês", "Educação Física"],
+    "Qui": ["História", "Matemática", "Artes"],
+    "Sex": ["Ciências", "Geografia", "Português"]
+  }
+}
